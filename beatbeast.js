@@ -1761,60 +1761,70 @@ class WallSpike {
         if (wet == 1) {
             for (let z = 0; z < 12; z++) {
 
-                let pc1 = l1.crashPoint(circle)
-                let pc2 = l2.crashPoint(circle)
-                let pc3 = f1.crashPoint(circle)
-                let pc4 = f2.crashPoint(circle)
                 if (trapper == 0) {
 
+                    let pc1 = l1.crashPoint(circle)
                     if (pc1.length > 0) {
                         let l = new LineOP(pc1[0], circle)
                         circle.x -= Math.cos(l.angle()) * 2
                         circle.y -= Math.sin(l.angle()) * 2
-                    } else if (pc2.length > 0) {
+                    }
+                    let pc2 = l2.crashPoint(circle)
+                    if (pc2.length > 0) {
                         let l = new LineOP(pc2[0], circle)
                         circle.x -= Math.cos(l.angle()) * 2
                         circle.y -= Math.sin(l.angle()) * 2
-                    } else if (pc3.length > 0) {
+                    }
+                    let pc3 = f1.crashPoint(circle)
+                    if (pc3.length > 0) {
                         let l = new LineOP(pc3[0], circle)
                         circle.x -= Math.cos(l.angle()) * 2
                         circle.y -= Math.sin(l.angle()) * 2
-                    } else if (pc4.length > 0) {
+                    }
+                    let pc4 = f2.crashPoint(circle)
+                    if (pc4.length > 0) {
                         let l = new LineOP(pc4[0], circle)
                         circle.x -= Math.cos(l.angle()) * 2
                         circle.y -= Math.sin(l.angle()) * 2
                     }
                 } else {
+                    let pc1 = l1.crashPoint(circle)
                     if (pc1.length > 0) {
                         let l = new LineOP(pc1[0], circle)
                         let a = l.angle()
+                        canvas_context.translate(Math.cos(a) * 2, Math.sin(a) * 2)
                         circle.x -= Math.cos(a) * 2
                         circle.y -= Math.sin(a) * 2
-                        canvas_context.translate(Math.cos(a) * 2, Math.sin(a) * 2)
                         translator.x += Math.cos(a) * 2
                         translator.y += Math.sin(a) * 2
-                    } else if (pc2.length > 0) {
+                    }
+                    let pc2 = l2.crashPoint(circle)
+                    if (pc2.length > 0) {
                         let l = new LineOP(pc2[0], circle)
                         let a = l.angle()
+                        canvas_context.translate(Math.cos(a) * 2, Math.sin(a) * 2)
                         circle.x -= Math.cos(a) * 2
                         circle.y -= Math.sin(a) * 2
-                        canvas_context.translate(Math.cos(a) * 2, Math.sin(a) * 2)
                         translator.x += Math.cos(a) * 2
                         translator.y += Math.sin(a) * 2
-                    } else if (pc3.length > 0) {
+                    }
+                    let pc3 = f1.crashPoint(circle)
+                    if (pc3.length > 0) {
                         let l = new LineOP(pc3[0], circle)
                         let a = l.angle()
+                        canvas_context.translate(Math.cos(a) * 2, Math.sin(a) * 2)
                         circle.x -= Math.cos(a) * 2
                         circle.y -= Math.sin(a) * 2
-                        canvas_context.translate(Math.cos(a) * 2, Math.sin(a) * 2)
                         translator.x += Math.cos(a) * 2
                         translator.y += Math.sin(a) * 2
-                    } else if (pc4.length > 0) {
+                    }
+                    let pc4 = f2.crashPoint(circle)
+                    if (pc4.length > 0) {
                         let l = new LineOP(pc4[0], circle)
                         let a = l.angle()
+                        canvas_context.translate(Math.cos(a) * 2, Math.sin(a) * 2)
                         circle.x -= Math.cos(a) * 2
                         circle.y -= Math.sin(a) * 2
-                        canvas_context.translate(Math.cos(a) * 2, Math.sin(a) * 2)
                         translator.x += Math.cos(a) * 2
                         translator.y += Math.sin(a) * 2
                     }
@@ -2336,12 +2346,56 @@ class TongueSpike {
         return false
     }
 }
+
+let gearItems = []
+
+for (let t = 0; t < 46; t++) {
+    const ing = new Image()
+    if (t < 10) {
+        ing.src = `gearItem0000${t}.png`
+    } else {
+        ing.src = `gearItem000${t}.png`
+    }
+    gearItems.push(ing)
+}
+
+
+
+class Gear {
+    constructor(type, guy, index) {
+        this.guy = guy
+        this.type = type
+        this.index = index
+        if (this.type == -1) {
+            return
+        }
+        if (this.type == 0) {
+            return
+        }
+    }
+    draw() {
+        this.x = (-translator.x) + (60 * this.index)
+        this.y = (-translator.y) + 660
+        this.box = new Rectangle(this.x, this.y, 60, 60, "gray")
+        this.box.draw()
+        if (this.type != -1) {
+            let rat = gearItems[this.type].width / gearItems[this.type].height
+            canvas_context.drawImage(gearItems[this.type], 0, 0, gearItems[this.type].height, gearItems[this.type].height, this.x, this.y, 60, 60)
+        }
+    }
+}
+
+
 let translator = { x: 0, y: 0 }
 canvas_context.translate(-360 - (1280 - (640 - 360)), -360 - 720)
 translator.x -= 360 + (1280 - (640 - 360))
 translator.y -= 360 + 720
+
+
+
 class Champ {
     constructor(type, team) {
+        this.ID = Math.floor(Math.random()*9000000)
         this.meleeRange = this.meleeRangeMaker(type)
         this.gold = 360
         this.goldtotal = this.gold
@@ -2355,6 +2409,7 @@ class Champ {
         team.players.push(this)
         this.type = type
         this.activeArts = []
+        this.gear = [new Gear(0, this, 0), new Gear(1, this, 1), new Gear(2, this, 2), new Gear(3, this, 3)]
         this.abilities = [this.power1(this.type), this.power2(this.type), this.power3(this.type), this.power4(this.type)]
         this.body = new Circle((1280 - (640 - 360)) * 2, 720 * 2, 32, "red")
         this.basicAttack = this.makeBasic()
@@ -2495,6 +2550,56 @@ class Champ {
         }
         return this.speed
     }
+    bighealthDraw() {
+        if (this.health < 0) {
+            this.health = 0
+        }
+        if (this.health > this.maxhealth) {
+            this.health = this.maxhealth
+        }
+        if (this.mana < 0) {
+            this.mana = 0
+        }
+        if (this.mana > this.maxmana) {
+            this.mana = this.maxmana
+        }
+        this.healthBar = new Rectangle(this.gear[0].box.x, this.gear[0].box.y - 13, 480 * (this.health / this.maxhealth), 13, "#00ff00")
+        this.healthBarBack = new Rectangle(this.gear[0].box.x, this.gear[0].box.y - 13, 480, 13, "#000000")
+        this.healthBarOut = new Rectangle(this.gear[0].box.x - 2, this.gear[0].box.y - 15, 484, 15, "#000000")
+        this.healthBarOut.draw()
+        this.healthBarBack.draw()
+        this.healthBar.draw()
+        canvas_context.fillStyle = "black"
+        canvas_context.font = "13px comic sans ms"
+        canvas_context.fillText(Math.round(this.health) + "/" + this.maxhealth, this.healthBar.x + 210, this.healthBar.y + 12)
+        if (this.type != -1) {
+
+            this.manaBar = new Rectangle(this.gear[0].box.x, this.gear[0].box.y - 28, 480 * (this.mana / this.maxmana), 13, "#00ffff")
+            this.manaBarBack = new Rectangle(this.gear[0].box.x, this.gear[0].box.y - 28, 480, 13, "#000000")
+            this.manaBarOut = new Rectangle(this.gear[0].box.x - 2, this.gear[0].box.y - 30, 484, 15, "#000000")
+            this.manaBarOut.draw()
+            this.manaBarBack.draw()
+            this.manaBar.draw()
+            let mb = Math.floor(this.maxmana / 100)
+            let mbx = (this.maxmana / 100)
+            for (let g = 1; g < mb; g++) {
+                let x = (this.manaBar.x + ((480 / mb) * g)) - .25
+                let rect = new Rectangle(x, this.manaBar.y, .5, 10, "black")
+                rect.draw()
+            }
+            canvas_context.fillStyle = "black"
+            canvas_context.font = "13px comic sans ms"
+            canvas_context.fillText(Math.round(this.mana) + "/" + this.maxmana, this.manaBar.x + 210, this.manaBar.y + 12)
+        }
+        let hb = Math.floor(this.maxhealth / 100)
+        let hbx = (this.maxhealth / 100)
+        for (let g = 1; g < hb; g++) {
+            let x = (this.healthBar.x + ((480 / hb) * g)) - .25
+            let rect = new Rectangle(x, this.healthBar.y, .5, 10, "black")
+            rect.draw()
+        }
+        // console.log(this)
+    }
     healthDraw() {
         if (this.health < 0) {
             this.health = 0
@@ -2602,6 +2707,17 @@ class Champ {
                 this.activeArts[t].radius *= this.activeArts[t].growth
             }
             this.activeArts[t].move()
+
+            if(ws.readyState == 1){
+                let json ={}
+                json.collider == 1
+                json.packet = JSON.stringify(this.activeArts[t])
+                json.id = this.ID
+                ws.send(JSON.stringify(json))
+            }
+
+
+
             this.activeArts[t].draw()
             this.activeArts[t].life--
         }
@@ -2617,9 +2733,9 @@ class Champ {
             if (this.type == -1) {
                 return 50 + Math.floor(Math.random() * 11)
             } else {
-                if(this.goldtotal > 0){
+                if (this.goldtotal > 0) {
                     return 100 + Math.floor(Math.random() * 11) + Math.floor(this.goldtotal / 6)
-                }else{
+                } else {
                     return 100
                 }
             }
@@ -2627,13 +2743,16 @@ class Champ {
         return 0
     }
     drawUI() {
-        this.UI = [new Rectangle(400, 660, 60, 60, "#FF00FF"), new Rectangle(460, 660, 60, 60, "#FFff00"), new Rectangle(520, 660, 60, 60, "#00FFff"), new Rectangle(580, 660, 60, 60, "#FFFFFF")]
+        this.UI = [new Rectangle(240, 660, 60, 60, "#FF00FF"), new Rectangle(300, 660, 60, 60, "#FFff00"), new Rectangle(360, 660, 60, 60, "#00FFff"), new Rectangle(420, 660, 60, 60, "#FFFFFF")]
 
         canvas_context.fillStyle = "gold"
         canvas_context.font = "30px comic sans ms"
         canvas_context.fillText(this.gold, 20 - translator.x, 40 - translator.y)
 
 
+        for (let t = 0; t < this.gear.length; t++) {
+            this.gear[t].draw()
+        }
         for (let t = 0; t < this.UI.length; t++) {
             this.UI[t].x -= translator.x
             this.UI[t].y -= translator.y
@@ -2641,7 +2760,7 @@ class Champ {
                 this.UI[t].draw()
                 canvas_context.fillStyle = "black"
                 canvas_context.font = "20px comic sans ms"
-                canvas_context.fillText((1+Math.floor(this.cooldowns[t] / 60)), this.UI[t].x + 5, this.UI[t].y + 30)
+                canvas_context.fillText((1 + Math.floor(this.cooldowns[t] / 60)), this.UI[t].x + 5, this.UI[t].y + 30)
             } else[
                 this.UI[t].draw()
             ]
@@ -2713,7 +2832,7 @@ class Champ {
             if (this.goal == this.body) {
 
             } else {
-                if (Math.abs(this.goal.x - this.body.x) + Math.abs(this.goal.y - this.body.y) > 16) {
+                if (Math.abs(this.goal.x - this.body.x) + Math.abs(this.goal.y - this.body.y) > 2) {
                     for (let t = 0; t < ((this.speed + this.tempSpeed) * 2) * this.slowedByFloor; t++) {
                         let as = (new LineOP(this.goal, this.body)).angle()
                         this.body.x += Math.sign(this.goal.x - this.body.x) * .5 + ((Math.cos(as) / 5))
@@ -3701,52 +3820,54 @@ guy2.body.x = 1920 * 2
 guy2.body.y = 1970 * 2
 let players = [missileaneous, guy, guy2]
 let walls = []
-let xWallRight1 = new WallSpike(new Point(1358, 858), 205, 0, "red")
-let xWallLeft1 = new WallSpike(new Point(1358, 858), 205, Math.PI, "red")
+let xWallRight1 = new WallSpike(new Point(1358, 858), 200, 0, "red")
+let xWallLeft1 = new WallSpike(new Point(1358, 858), 200, Math.PI, "red")
 walls.push(xWallRight1)
 walls.push(xWallLeft1)
-let xWallRight2 = new WallSpike(new Point(816, 1340), 205, 0, "red")
-let xWallLeft2 = new WallSpike(new Point(816, 1340), 205, Math.PI, "red")
+let xWallRight2 = new WallSpike(new Point(816, 1340), 200, 0, "red")
+let xWallLeft2 = new WallSpike(new Point(816, 1340), 200, Math.PI, "red")
 walls.push(xWallRight2)
 walls.push(xWallLeft2)
-let xWallRight3 = new WallSpike(new Point(1832, 1388), 205, 0, "red")
-let xWallLeft3 = new WallSpike(new Point(1832, 1388), 205, Math.PI, "red")
+let xWallRight3 = new WallSpike(new Point(1832, 1388), 200, 0, "red")
+let xWallLeft3 = new WallSpike(new Point(1832, 1388), 200, Math.PI, "red")
 walls.push(xWallRight3)
 walls.push(xWallLeft3)
-let xWallRight4 = new WallSpike(new Point(1288, 1872), 205, 0, "red")
-let xWallLeft4 = new WallSpike(new Point(1288, 1872), 205, Math.PI, "red")
+let xWallRight4 = new WallSpike(new Point(1288, 1872), 200, 0, "red")
+let xWallLeft4 = new WallSpike(new Point(1288, 1872), 200, Math.PI, "red")
 walls.push(xWallRight4)
 walls.push(xWallLeft4)
-let zWallTop1 = new WallSpike(new Point(1372, 348), 205 * 1.75, Math.PI + (Math.PI * .5), "red")
+
+
+let zWallTop1 = new WallSpike(new Point(1372, 348), 215 * 1.75, Math.PI + (Math.PI * .5), "red")
 walls.push(zWallTop1)
-let zWallTop2 = new WallSpike(new Point(1884, 384), 205 * 1.75, Math.PI + (Math.PI * .5), "red")
+let zWallTop2 = new WallSpike(new Point(1884, 384), 215 * 1.75, Math.PI + (Math.PI * .5), "red")
 walls.push(zWallTop2)
-let zWallTop3 = new WallSpike(new Point(874, 332), 205 * 1.75, Math.PI + (Math.PI * .5), "red")
+let zWallTop3 = new WallSpike(new Point(874, 332), 215 * 1.75, Math.PI + (Math.PI * .5), "red")
 walls.push(zWallTop3)
 
 
-let yWallBottom1 = new WallSpike(new Point(337, 800), 205 * 1.75, Math.PI + .075, "red")
+let yWallBottom1 = new WallSpike(new Point(337, 800), 215 * 1.75, Math.PI + .075, "red")
 walls.push(yWallBottom1)
-let yWallBottom2 = new WallSpike(new Point(306, 1308), 205 * 1.75, Math.PI + .075, "red")
+let yWallBottom2 = new WallSpike(new Point(306, 1308), 215 * 1.75, Math.PI + .075, "red")
 walls.push(yWallBottom2)
-let yWallBottom3 = new WallSpike(new Point(288, 1812), 205 * 1.75, Math.PI + .075, "red")
+let yWallBottom3 = new WallSpike(new Point(288, 1812), 215 * 1.75, Math.PI + .075, "red")
 walls.push(yWallBottom3)
 
 
 
-let wWallRight1 = new WallSpike(new Point(2364, 908), 200 * 1.75, 0 + .075, "red")
+let wWallRight1 = new WallSpike(new Point(2364, 908), 215 * 1.75, 0 + .075, "red")
 walls.push(wWallRight1)
-let wWallRight2 = new WallSpike(new Point(2344, 1422), 200 * 1.75, 0 + .075, "red")
+let wWallRight2 = new WallSpike(new Point(2344, 1422), 215 * 1.75, 0 + .075, "red")
 walls.push(wWallRight2)
-let wWallRight3 = new WallSpike(new Point(2304, 1938), 200 * 1.75, 0 + .075, "red")
+let wWallRight3 = new WallSpike(new Point(2304, 1938), 215 * 1.75, 0 + .075, "red")
 walls.push(wWallRight3)
 
 
-let qWallRight1 = new WallSpike(new Point(760, 2350), 200 * 1.75, Math.PI - (Math.PI * .5) + .075, "red")
+let qWallRight1 = new WallSpike(new Point(760, 2350), 215 * 1.75, Math.PI - (Math.PI * .5) + .075, "red")
 walls.push(qWallRight1)
-let qWallRight2 = new WallSpike(new Point(1270, 2370), 200 * 1.75, Math.PI - (Math.PI * .5) + .075, "red")
+let qWallRight2 = new WallSpike(new Point(1270, 2370), 215 * 1.75, Math.PI - (Math.PI * .5) + .075, "red")
 walls.push(qWallRight2)
-let qWallRight3 = new WallSpike(new Point(1770, 2410), 200 * 1.75, Math.PI - (Math.PI * .5) + .075, "red")
+let qWallRight3 = new WallSpike(new Point(1770, 2410), 215 * 1.75, Math.PI - (Math.PI * .5) + .075, "red")
 walls.push(qWallRight3)
 
 for (let t = 0; t < walls.length; t++) {
@@ -3760,6 +3881,75 @@ wodmap.src = "wodmap3.png"
 let wodmapz = new Image()
 wodmapz.src = "wodmapz.png"
 let time = 0
+
+
+let ws
+
+
+
+let chatsetup = 0
+let HOST = location.origin.replace(/^http/, 'ws')
+ws = new WebSocket(HOST);
+let enterlock = 0
+let typing = 0
+
+
+socketize(ws)
+function socketize(ws) {
+
+    // ws.addEventListener("open", () => {
+    ws.addEventListener("message", ({ data }) => {
+        if (JSON.parse(data).flies >= 0) {
+            // //console.log("hit")
+
+            if (frogIds.includes(JSON.parse(data).id)) {
+                if (JSON.parse(data).champ == 1) {
+                        tadpoles[frogIds.indexOf(JSON.parse(data).id)] = new Champ(JSON.parse(data).type)
+                }
+            } else {
+
+                frogIds.push(JSON.parse(data).id)
+
+                if (JSON.parse(data).frog == 1) {
+                    if (JSON.parse(data).type == 1) {
+                        tadpoles[frogIds.length - 1] = new BullFrog(JSON.parse(data))
+                    } else if (JSON.parse(data).type == 2) {
+                        tadpoles[frogIds.length - 1] = new GlideFrog(JSON.parse(data))
+                    } else if (JSON.parse(data).type == 3) {
+                        tadpoles[frogIds.length - 1] = new Frog(JSON.parse(data))
+                    } else if (JSON.parse(data).type == 4) {
+                        tadpoles[frogIds.length - 1] = new PygmyFrog(JSON.parse(data))
+                    }
+                }
+            }
+
+
+            // //console.log(tadpoles)
+        } else {
+
+            textcanvas_context.font = "12px arial"
+            textcanvas_context.fillStyle = JSON.parse(data).color
+            if (typeof JSON.parse(data).name != "undefined") {
+                textcanvas_context.fillText(`(${JSON.parse(data).name}) ` + JSON.parse(data).text, 0, 300 + textscroll)
+
+                textcanvas_context.clearRect(0, 320 + textscroll, 1000, 40)
+                textscroll += 12
+            }
+            // textcanvas_context.translate(0, 12)
+            // textcanvas.translate(0, 12)
+        }
+    })
+
+    setTimeout(() => {
+        let json = {}
+        json.connecting = 1
+        ws.send(JSON.stringify(json))
+    }, 2000)
+    
+    // })
+
+}
+
 
 
 function main() {
@@ -3844,7 +4034,8 @@ function main() {
     }
     for (let t = 0; t < players.length; t++) {
         if (players[t].selected == 1) {
-            players[t].drawUI()
+            players[t].drawUI() 
+            players[t].bighealthDraw()
         }
     }
     for (let t = 0; t < players.length; t++) {
